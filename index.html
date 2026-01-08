@@ -3,42 +3,57 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>PassVerter — Simple & High-Contrast</title>
-  <meta name="description" content="Simple Passverter: image, audio, video, docs, misc — minimal UI, high contrast, smooth." />
+  <title>PassVerter</title>
+  <meta name="description" content="Simple Passverter: image, audio, video, docs, misc — minimal UI, high contrast, smooth. Enhanced UI/UX with real features." />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#ffffff;--surface:#ffffff;--text:#030712;--muted:#334155;--accent:#0ea5a4;--danger:#ef4444;--border:#0b1220;--radius:12px}
+    :root{
+      --bg:#ffffff;--surface:#ffffff;--text:#030712;--muted:#334155;--accent:#0ea5a4;--accent-2:#06b6d4;--danger:#ef4444;--border:#0b1220;--radius:12px;--glass: rgba(11,18,32,0.04)
+    }
     *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0}
     html,body{height:100%;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 
     .wrap{max-width:1100px;margin:28px auto;padding:18px}
     header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
     .brand{display:flex;align-items:center;gap:12px}
-    .logo{width:56px;height:56px;border-radius:10px;background:var(--accent);color:white;display:flex;align-items:center;justify-content:center;font-weight:800}
+    .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white;display:flex;align-items:center;justify-content:center;font-weight:800}
     h1{font-size:20px;margin:0}
     .sub{font-size:13px;color:var(--muted)}
 
     .layout{display:grid;grid-template-columns:220px 1fr;gap:18px}
-    nav{background:var(--surface);border-radius:12px;padding:12px;border:2px solid var(--border)}
-    nav button{display:block;width:100%;padding:10px;border-radius:8px;border:0;background:transparent;text-align:left;color:var(--text);font-weight:600;margin-bottom:8px;cursor:pointer;transition:all .15s}
-    nav button.active{background:var(--accent);color:white}
+    nav{background:var(--surface);border-radius:12px;padding:12px;border:2px solid var(--border);box-shadow:0 6px 18px var(--glass)}
+    nav button{display:block;width:100%;padding:10px;border-radius:8px;border:0;background:transparent;text-align:left;color:var(--text);font-weight:600;margin-bottom:8px;cursor:pointer;transition:all .22s cubic-bezier(.2,.9,.2,1);transform-origin:left}
+    nav button:hover{transform:translateX(4px)}
+    nav button.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;box-shadow:0 6px 12px rgba(6,182,212,0.12)}
 
-    main{background:var(--surface);border-radius:12px;padding:14px;border:2px solid var(--border);min-height:420px}
-    section{display:none}
-    section.active{display:block}
+    main{background:var(--surface);border-radius:12px;padding:14px;border:2px solid var(--border);min-height:420px;position:relative;overflow:hidden}
+    /* panel stacking to allow smooth transitions */
+    main section{position:absolute;inset:0;padding:20px;opacity:0;transform:translateY(10px) scale(.995);pointer-events:none;transition:opacity .34s ease,transform .34s cubic-bezier(.22,.9,.2,1)}
+    main section.active{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
 
-    .drop{border:2px dashed var(--border);padding:18px;border-radius:10px;text-align:center;cursor:pointer;color:var(--muted);background:rgba(14,165,164,0.03)}
-    .controls{display:flex;gap:10px;align-items:center;margin-top:12px}
+    .drop{border:2px dashed var(--border);padding:18px;border-radius:10px;text-align:center;cursor:pointer;color:var(--muted);background:linear-gradient(180deg, rgba(14,165,164,0.03), transparent);transition:all .18s}
+    .drop.hover{border-color:var(--accent);box-shadow:0 8px 30px rgba(6,182,212,0.06)}
+
+    .controls{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
     select,input{padding:8px;border-radius:8px;border:1px solid var(--border)}
-    .btn{padding:10px 12px;border-radius:8px;border:0;background:var(--accent);color:white;cursor:pointer;font-weight:700}
+    input[type=number]{-moz-appearance:textfield}
+    .btn{padding:10px 12px;border-radius:8px;border:0;background:var(--accent);color:white;cursor:pointer;font-weight:700;transition:transform .14s,box-shadow .14s}
+    .btn:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(14,165,164,0.12)}
     .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
 
     .files{margin-top:12px}
-    .file{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);margin-bottom:8px}
+    .file{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.04);margin-bottom:8px;gap:10px;background:linear-gradient(180deg, rgba(255,255,255,0.6), transparent);transition:transform .18s,box-shadow .18s}
+    .file:hover{transform:translateY(-4px);box-shadow:0 10px 22px rgba(11,18,32,0.04)}
+    .file .meta{display:flex;gap:10px;align-items:center}
+    .thumb{width:56px;height:56px;border-radius:6px;object-fit:cover;border:1px solid rgba(0,0,0,0.06)}
     .file small{color:var(--muted)}
 
+    .file-actions{display:flex;gap:6px}
+    .move{display:flex;flex-direction:column;gap:6px}
+    .move button{padding:6px 8px;border-radius:6px;border:0;background:transparent;cursor:pointer;font-weight:700}
+
     .progress{height:8px;background:rgba(0,0,0,0.06);border-radius:8px;overflow:hidden;margin-top:10px}
-    .progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#06b6d4);transition:width .2s}
+    .progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .2s}
 
     footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
 
@@ -72,11 +87,16 @@
         <section id="panel-image" class="active">
           <h2>Image</h2>
           <div class="drop" id="imgDrop">Drop or click to select images (PNG, JPG, WebP)</div>
+
           <div class="controls">
             <select id="imgFormat"><option value="image/jpeg">JPG</option><option value="image/webp">WebP</option><option value="pdf">PDF</option></select>
+            <label style="display:flex;gap:6px;align-items:center"><small class="sub">W</small><input id="imgWidth" type="number" min="1" placeholder="auto" style="width:90px"></label>
+            <label style="display:flex;gap:6px;align-items:center"><small class="sub">H</small><input id="imgHeight" type="number" min="1" placeholder="auto" style="width:90px"></label>
+            <label style="display:flex;gap:6px;align-items:center"><input id="imgKeep" type="checkbox" checked> Keep aspect</label>
             <input id="imgQuality" type="number" min="0.1" max="1" step="0.01" value="0.92" style="width:90px">
             <button class="btn" id="imgConvert">Convert</button>
           </div>
+
           <div class="files" id="imgFiles"></div>
           <div class="progress" id="imgProgress" style="display:none"><i></i></div>
           <div class="log" id="imgLog"></div>
@@ -140,48 +160,106 @@
 
   <!-- libs (loaded on demand) -->
   <script>
-    // Minimal, simple, and clear JS — all panels visible via nav
+    // Smooth panel switching
     const panels = document.querySelectorAll('nav button[data-panel]');
     panels.forEach(btn=>{
       btn.addEventListener('click', ()=>{
         document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
+        const target = document.getElementById('panel-'+btn.dataset.panel);
         document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));
-        document.getElementById('panel-'+btn.dataset.panel).classList.add('active');
+        // allow CSS transitions by activating target after brief tick
+        requestAnimationFrame(()=>{ target.classList.add('active'); });
       });
     });
 
-    // Generic drop handler
+    // Generic drop handler with visual feedback
     function makeDrop(id, acceptFn, onFiles){
       const el = document.getElementById(id);
       el.addEventListener('click', ()=>{ const inp = document.createElement('input'); inp.type='file'; inp.multiple=true; inp.onchange = e=> onFiles([...e.target.files].filter(acceptFn)); inp.click(); });
-      el.addEventListener('dragover', e=>{ e.preventDefault(); el.style.borderColor='var(--accent)'; });
-      el.addEventListener('dragleave', e=>{ el.style.borderColor='var(--border)'; });
-      el.addEventListener('drop', e=>{ e.preventDefault(); onFiles([...e.dataTransfer.files].filter(acceptFn)); el.style.borderColor='var(--border)'; });
+      el.addEventListener('dragover', e=>{ e.preventDefault(); el.classList.add('hover'); });
+      el.addEventListener('dragleave', e=>{ el.classList.remove('hover'); });
+      el.addEventListener('drop', e=>{ e.preventDefault(); const files=[...e.dataTransfer.files].filter(acceptFn); onFiles(files); el.classList.remove('hover'); });
     }
 
-    // Render file lists
-    function renderList(containerId, files){ const c = document.getElementById(containerId); c.innerHTML=''; files.forEach(f=>{ const d = document.createElement('div'); d.className='file'; const left = document.createElement('div'); left.innerHTML = `<div style="font-weight:700">${f.name}</div><small>${Math.round(f.size/1024)} KB • ${f.type||'n/a'}</small>`; const right = document.createElement('div'); const preview = document.createElement('button'); preview.className='btn ghost'; preview.textContent='Preview'; preview.onclick=()=>previewFile(f); const remove = document.createElement('button'); remove.className='btn ghost'; remove.textContent='Remove'; remove.onclick=()=>{ files.splice(files.indexOf(f),1); renderList(containerId, files); }; right.appendChild(preview); right.appendChild(remove); d.appendChild(left); d.appendChild(right); c.appendChild(d); }); }
+    // Helper: saveAs loader
+    async function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
 
-    function previewFile(f){ if(f.type.startsWith('image/')){ const w = window.open(''); const img = w.document.createElement('img'); img.src = URL.createObjectURL(f); img.style.maxWidth='100%'; w.document.body.style.margin='0'; w.document.body.appendChild(img); } else if(f.type.startsWith('audio/')){ const w = window.open(''); const a = w.document.createElement('audio'); a.controls=true; a.src = URL.createObjectURL(f); w.document.body.style.margin='0'; w.document.body.appendChild(a); } else if(f.type.startsWith('video/')){ const w = window.open(''); const v = w.document.createElement('video'); v.controls=true; v.src = URL.createObjectURL(f); v.style.maxWidth='100%'; w.document.body.style.margin='0'; w.document.body.appendChild(v); } else alert('Preview not available'); }
+    // RENDER LIST: unified function for file lists with preview + move up/down
+    function renderFileList(containerId, arr){ const c=document.getElementById(containerId); c.innerHTML=''; arr.forEach((f, idx)=>{
+      const d=document.createElement('div'); d.className='file';
+      const left=document.createElement('div'); left.className='meta';
+      // thumbnail for images
+      let thumbHTML = '';
+      if(f.type && f.type.startsWith('image/')){
+        const img = document.createElement('img'); img.className='thumb'; img.src = URL.createObjectURL(f); left.appendChild(img);
+      }
+      const info=document.createElement('div'); info.innerHTML=`<div style="font-weight:700">${f.name}</div><small>${Math.round(f.size/1024)} KB • ${f.type||'n/a'}</small>`;
+      left.appendChild(info);
 
-    // IMAGE logic
+      const right=document.createElement('div'); right.className='file-actions';
+      right.style.display='flex'; right.style.alignItems='center';
+
+      const preview=document.createElement('button'); preview.className='btn ghost'; preview.textContent='Preview'; preview.onclick=()=>previewFile(f);
+      const remove=document.createElement('button'); remove.className='btn ghost'; remove.textContent='Remove'; remove.onclick=()=>{ arr.splice(idx,1); renderFileList(containerId,arr); };
+
+      // move up/down buttons
+      const moveDiv = document.createElement('div'); moveDiv.className='move';
+      const up = document.createElement('button'); up.textContent='▲'; up.title='Move up'; up.onclick=()=>{ if(idx>0){ arr.splice(idx-1,0,arr.splice(idx,1)[0]); renderFileList(containerId,arr); } };
+      const down = document.createElement('button'); down.textContent='▼'; down.title='Move down'; down.onclick=()=>{ if(idx < arr.length-1){ arr.splice(idx+1,0,arr.splice(idx,1)[0]); renderFileList(containerId,arr); } };
+      moveDiv.appendChild(up); moveDiv.appendChild(down);
+
+      right.appendChild(preview); right.appendChild(remove); right.appendChild(moveDiv);
+      d.appendChild(left); d.appendChild(right);
+      c.appendChild(d);
+    }); }
+
+    function previewFile(f){ if(f.type && f.type.startsWith('image/')){ const w = window.open(''); const img = w.document.createElement('img'); img.src = URL.createObjectURL(f); img.style.maxWidth='100%'; w.document.body.style.margin='0'; w.document.body.appendChild(img); } else if(f.type && f.type.startsWith('audio/')){ const w = window.open(''); const a = w.document.createElement('audio'); a.controls=true; a.src = URL.createObjectURL(f); w.document.body.style.margin='0'; w.document.body.appendChild(a); } else if(f.type && f.type.startsWith('video/')){ const w = window.open(''); const v = w.document.createElement('video'); v.controls=true; v.src = URL.createObjectURL(f); v.style.maxWidth='100%'; w.document.body.style.margin='0'; w.document.body.appendChild(v); } else { alert('Preview not available'); } }
+
+    // IMAGE logic (enhanced with resize inputs)
     let imageFiles = [];
-    makeDrop('imgDrop', f=>f.type.startsWith('image/'), files=>{ imageFiles.push(...files); renderList('imgFiles', imageFiles); document.getElementById('imgLog').textContent = imageFiles.length+' file(s)'; });
-    async function convertImage(file, mime, quality){ const dataUrl = await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }); const img = await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=dataUrl; }); const canvas = document.createElement('canvas'); canvas.width = img.width; canvas.height = img.height; const ctx = canvas.getContext('2d'); ctx.drawImage(img,0,0); if(mime==='pdf'){ // simple single-page PDF
-        const { jsPDF } = window.jspdf || {}; if(!jsPDF) throw new Error('jsPDF not loaded'); const pdf = new jsPDF({unit:'px',format:[canvas.width,canvas.height]}); const data = canvas.toDataURL('image/png', quality); pdf.addImage(data,'PNG',0,0,canvas.width,canvas.height); return pdf.output('blob'); }
-      const data = canvas.toDataURL(mime, quality); const blob = await (await fetch(data)).blob(); return blob; }
+    makeDrop('imgDrop', f=>f.type && f.type.startsWith('image/'), files=>{ imageFiles.push(...files); renderFileList('imgFiles', imageFiles); document.getElementById('imgLog').textContent = imageFiles.length+' file(s)'; });
+
+    async function convertImage(file, mime, quality, targetW, targetH, keepAspect){
+      const dataUrl = await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
+      const img = await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=dataUrl; });
+      // compute target size
+      let destW = img.width, destH = img.height;
+      if(targetW || targetH){
+        if(keepAspect){
+          if(targetW && !targetH){ destW = Math.max(1, Math.round(targetW)); destH = Math.round(img.height * (destW / img.width)); }
+          else if(!targetW && targetH){ destH = Math.max(1, Math.round(targetH)); destW = Math.round(img.width * (destH / img.height)); }
+          else { // both provided — fit inside preserving aspect
+            const ratio = Math.min(targetW/img.width, targetH/img.height);
+            destW = Math.max(1, Math.round(img.width * ratio)); destH = Math.max(1, Math.round(img.height * ratio));
+          }
+        } else {
+          destW = targetW ? Math.max(1, Math.round(targetW)) : img.width;
+          destH = targetH ? Math.max(1, Math.round(targetH)) : img.height;
+        }
+      }
+
+      const canvas = document.createElement('canvas'); canvas.width = destW; canvas.height = destH; const ctx = canvas.getContext('2d'); ctx.drawImage(img,0,0,destW,destH);
+
+      if(mime==='pdf'){
+        const { jsPDF } = window.jspdf || {}; if(!jsPDF) throw new Error('jsPDF not loaded'); const pdf = new jsPDF({unit:'px',format:[canvas.width,canvas.height]}); const data = canvas.toDataURL('image/png', quality); pdf.addImage(data,'PNG',0,0,canvas.width,canvas.height); return pdf.output('blob');
+      }
+      const data = canvas.toDataURL(mime, quality); const blob = await (await fetch(data)).blob(); return blob;
+    }
 
     document.getElementById('imgConvert').addEventListener('click', async ()=>{
       if(!imageFiles.length) return document.getElementById('imgLog').textContent='No images';
       const fmt = document.getElementById('imgFormat').value;
       const quality = parseFloat(document.getElementById('imgQuality').value) || 0.92;
+      const wInput = parseInt(document.getElementById('imgWidth').value) || null;
+      const hInput = parseInt(document.getElementById('imgHeight').value) || null;
+      const keep = document.getElementById('imgKeep').checked;
       const bar = document.querySelector('#imgProgress i'); document.getElementById('imgProgress').style.display='block';
       try{
         const outputs = [];
         for(let i=0;i<imageFiles.length;i++){
           bar.style.width = Math.round((i/imageFiles.length)*100) + '%';
-          const blob = await convertImage(imageFiles[i], fmt==='pdf' ? 'pdf' : fmt, quality);
+          const blob = await convertImage(imageFiles[i], fmt==='pdf' ? 'pdf' : fmt, quality, wInput, hInput, keep);
           const name = imageFiles[i].name.replace(/\.[^/.]+$/, '') + (fmt==='pdf'?'.pdf':'.'+(fmt.split('/')[1]||fmt));
           outputs.push({name,blob});
         }
@@ -193,14 +271,12 @@
     });
 
     // AUDIO & VIDEO: minimal ffmpeg loading when needed
-    async function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
-
     let ffmpeg = null, ffmpegReady = false;
     async function ensureFFmpeg(){ if(ffmpegReady) return; if(!window.createFFmpeg) await loadScript('https://unpkg.com/@ffmpeg/ffmpeg@0.11.7/dist/ffmpeg.min.js'); ffmpeg = createFFmpeg({log:false}); document.getElementById('audioLog').textContent='Loading FFmpeg…'; await ffmpeg.load(); ffmpegReady=true; document.getElementById('audioLog').textContent='FFmpeg ready'; }
 
     // AUDIO
     let audioFiles = [];
-    makeDrop('audioDrop', f=>f.type.startsWith('audio/'), files=>{ audioFiles.push(...files); renderList('audioFiles', audioFiles); document.getElementById('audioLog').textContent = audioFiles.length+' file(s)'; });
+    makeDrop('audioDrop', f=>f.type && f.type.startsWith('audio/'), files=>{ audioFiles.push(...files); renderFileList('audioFiles', audioFiles); document.getElementById('audioLog').textContent = audioFiles.length+' file(s)'; });
     document.getElementById('audioConvert').addEventListener('click', async ()=>{
       if(!audioFiles.length) return document.getElementById('audioLog').textContent='No audio files';
       await ensureFFmpeg(); const fmt = document.getElementById('audioFormat').value; const bar = document.querySelector('#audioProgress i'); document.getElementById('audioProgress').style.display='block';
@@ -217,7 +293,7 @@
 
     // VIDEO
     let videoFiles = [];
-    makeDrop('videoDrop', f=>f.type.startsWith('video/'), files=>{ videoFiles.push(...files); renderList('videoFiles', videoFiles); document.getElementById('videoLog').textContent = videoFiles.length+' file(s)'; });
+    makeDrop('videoDrop', f=>f.type && f.type.startsWith('video/'), files=>{ videoFiles.push(...files); renderFileList('videoFiles', videoFiles); document.getElementById('videoLog').textContent = videoFiles.length+' file(s)'; });
     document.getElementById('videoConvert').addEventListener('click', async ()=>{
       if(!videoFiles.length) return document.getElementById('videoLog').textContent='No video files';
       await ensureFFmpeg(); const fmt = document.getElementById('videoFormat').value; const bar = document.querySelector('#videoProgress i'); document.getElementById('videoProgress').style.display='block';
@@ -234,7 +310,7 @@
 
     // DOC
     let docFiles = [];
-    makeDrop('docDrop', f=>f.name.match(/\.(docx|pdf|txt)$/i), files=>{ docFiles.push(...files); renderList('docFiles', docFiles); document.getElementById('docLog').textContent = docFiles.length+' file(s)'; });
+    makeDrop('docDrop', f=>f.name.match(/\.(docx|pdf|txt)$/i), files=>{ docFiles.push(...files); renderFileList('docFiles', docFiles); document.getElementById('docLog').textContent = docFiles.length+' file(s)'; });
 
     async function loadLibsForDocs(){ if(!window.mammoth) await loadScript('https://unpkg.com/mammoth/mammoth.browser.min.js'); if(!window.jspdf) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'); if(!window.pdfjsLib) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js'); }
 
@@ -260,14 +336,11 @@
 
     // MISC: GIF frames
     let miscFiles = [];
-    makeDrop('miscDrop', f=>f.name.match(/\.(gif|zip)$/i), files=>{ miscFiles.push(...files); renderList('miscFiles', miscFiles); document.getElementById('miscLog').textContent = miscFiles.length+' file(s)'; });
+    makeDrop('miscDrop', f=>f.name.match(/\.(gif|zip)$/i), files=>{ miscFiles.push(...files); renderFileList('miscFiles', miscFiles); document.getElementById('miscLog').textContent = miscFiles.length+' file(s)'; });
     document.getElementById('gifExtract').addEventListener('click', async ()=>{
       const gifs = miscFiles.filter(f=>f.name.match(/\.gif$/i)); if(!gifs.length) return document.getElementById('miscLog').textContent='No GIFs'; if(!window.gifuct) await loadScript('https://unpkg.com/gifuct-js/dist/gifuct.min.js'); if(!window.JSZip) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js');
       for(const g of gifs){ document.getElementById('miscLog').textContent='Extracting '+g.name; const ab = await g.arrayBuffer(); const parsed = gifuct.parseGIF(ab); const frames = gifuct.decompressFrames(parsed, true); const zip = new JSZip(); for(let i=0;i<frames.length;i++){ const frame = frames[i]; const c = document.createElement('canvas'); c.width = frame.dims.width; c.height = frame.dims.height; const ctx = c.getContext('2d'); const imgdata = ctx.createImageData(frame.dims.width, frame.dims.height); imgdata.data.set(frame.patch); ctx.putImageData(imgdata,0,0); const dataUrl = c.toDataURL('image/png'); const blob = await (await fetch(dataUrl)).blob(); zip.file(g.name.replace(/\.gif$/i,'')+'-frame-'+i+'.png', blob); } const z = await zip.generateAsync({type:'blob'}); if(!window.saveAs) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js'); saveAs(z,g.name.replace(/\.gif$/i,'')+'-frames.zip'); document.getElementById('miscLog').textContent='Done'; }
     });
-
-    // helper for rendering lists used above
-    function renderList(containerId, arr){ const c=document.getElementById(containerId); c.innerHTML=''; arr.forEach(f=>{ const d=document.createElement('div'); d.className='file'; const left=document.createElement('div'); left.innerHTML=`<div style="font-weight:700">${f.name}</div><small>${Math.round(f.size/1024)} KB • ${f.type||'n/a'}</small>`; const right=document.createElement('div'); right.style.display='flex'; right.style.gap='6px'; const prev=document.createElement('button'); prev.className='btn ghost'; prev.textContent='Preview'; prev.onclick=()=>previewFile(f); const rm=document.createElement('button'); rm.className='btn ghost'; rm.textContent='Remove'; rm.onclick=()=>{ arr.splice(arr.indexOf(f),1); renderList(containerId,arr); }; right.appendChild(prev); right.appendChild(rm); d.appendChild(left); d.appendChild(right); c.appendChild(d); }); }
 
   </script>
 </body>
